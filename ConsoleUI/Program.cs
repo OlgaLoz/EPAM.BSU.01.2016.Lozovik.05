@@ -5,45 +5,59 @@ namespace ConsoleUI
 {
     class Program
     {
+        public class TagFinder : ITagFinder
+        {
+            public bool CompareByTag(Book book)
+            {
+                return book.Year == "2004";
+            }
+        }
+
+        public class Comparer : IComparer<Book>
+        {
+            public int Compare(Book x, Book y) => string.CompareOrdinal(x.Year, y.Year);
+        }
+
         static void Main(string[] args)
         {
-            IBookStreamer bookStreamer = new BinaryStreamer<Book>();
-            BookCollection bookCollection = new BookCollection(bookStreamer);
+            IRepository repository = new BinaryRepository();
+            BookService bookService = new BookService(repository);
 
-            bookCollection.AddBook(new Book());
-            bookCollection.AddBook(new Book("book1","author1","2000"));
-            bookCollection.AddBook(new Book("book2", "author2", "1995"));
-            bookCollection.AddBook(new Book("book3", "author3", "2012"));
-            bookCollection.AddBook(new Book("book4", "author4", "2001"));
-            bookCollection.AddBook(new Book("book5", "author5", "2004"));
-            bookCollection.AddBook(new Book("book6", "author6", "2004"));
-            bookCollection.AddBook(new Book("book7", "author7", "2004"));
-            bookCollection.AddBook(new Book("book0", null, ""));
-            bookCollection.AddBook(new Book("book8", "author8", "2000"));
+            bookService.AddBook(new Book());
+            bookService.AddBook(new Book("book1","author1","2000"));
+            bookService.AddBook(new Book("book2", "author2", "1995"));
+            bookService.AddBook(new Book("book3", "author3", "2012"));
+            bookService.AddBook(new Book("book4", "author4", "2001"));
+            bookService.AddBook(new Book("book5", "author5", "2004"));
+            bookService.AddBook(new Book("book6", "author6", "2004"));
+            bookService.AddBook(new Book("book7", "author7", "2004"));
+            bookService.AddBook(new Book("book0", null, ""));
+            bookService.AddBook(new Book("book8", "author8", "2000"));
             // bookCollection.AddBook(new Book()); Exception: This book is already exist!
-            ShowBooks(bookCollection);
+            ShowBooks(bookService.GetBooks());
 
-            bookCollection.RemoveBook(new Book("book8", "author8", "2000"));
-            bookCollection.RemoveBook(new Book());
+            bookService.RemoveBook(new Book("book8", "author8", "2000"));
+            bookService.RemoveBook(new Book());
             // bookCollection.RemoveBook(new Book());Exception: This book isn't exist!
 
-            IEnumerable<IBook> booksByTag = bookCollection.FindByTag(new TagFinder());
+            IEnumerable<Book> booksByTag = bookService.FindByTag(new TagFinder());
             ShowBooks(booksByTag);
             
-            bookCollection.SortByTag(new Comparer());
-            ShowBooks(bookCollection);
+            bookService.SortByTag(new Comparer());
+            ShowBooks(bookService.GetBooks());
 
-            bookCollection.SaveBooks("library");
-
-            BookCollection newBookCollection = new BookCollection(bookStreamer);
-            newBookCollection.LoadBooks("library");
+            bookService.SaveBooks("library");
             
-            ShowBooks(newBookCollection);
+
+            BookService newBookService = new BookService(repository);
+            newBookService.LoadBooks("library");
+            
+            ShowBooks(newBookService.GetBooks());
 
             Console.ReadKey();
         }
 
-        public static void ShowBooks(IEnumerable<IBook> bookCollection)
+        public static void ShowBooks(IEnumerable<Book> bookCollection)
         {
             foreach (var book in bookCollection)
             {
