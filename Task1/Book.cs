@@ -2,6 +2,7 @@
 
 namespace Task1
 {
+    [Serializable]
     public class Book :  IEquatable<Book>
     {
         public string Title { get; }

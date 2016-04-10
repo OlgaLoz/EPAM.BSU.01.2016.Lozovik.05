@@ -22,6 +22,7 @@ namespace ConsoleUI
         {
             IRepository repository = new BinaryRepository();
             IRepository xmlRepository = new XmlRepository();
+            IRepository binSerRepository = new BinarySerializationRepository();
 
             BookService bookService = new BookService();
 
@@ -48,6 +49,7 @@ namespace ConsoleUI
             bookService.SortByTag(new Comparer());
             ShowBooks(bookService.GetBooks());
 
+            bookService.SaveBooks(binSerRepository, "binLibrary");
             bookService.SaveBooks(xmlRepository, "xmlLibrary");
             bookService.SaveBooks(repository, "library");
             
@@ -55,7 +57,9 @@ namespace ConsoleUI
             BookService newBookService = new BookService();
           
             // newBookService.LoadBooks(repository, "library");
-            newBookService.LoadBooks(xmlRepository, "xmlLibrary");
+            // newBookService.LoadBooks(xmlRepository, "xmlLibrary");
+            newBookService.LoadBooks(binSerRepository, "binLibrary");
+
 
             ShowBooks(newBookService.GetBooks());
 
